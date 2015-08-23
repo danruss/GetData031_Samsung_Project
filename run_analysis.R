@@ -28,3 +28,23 @@ trainY <- read.table(paste(SubDir,"/train/y_train.txt",sep=""))
 testSubject <- read.table(paste(SubDir,"/test/subject_test.txt",sep=""))
 testX <- read.table(paste(SubDir,"/test/X_test.txt",sep=""))
 testY <- read.table(paste(SubDir,"/test/y_test.txt",sep=""))
+
+#concatenate the data tables by row
+subject <- rbind(trainSubject, testSubject)
+X <- rbind(trainX, testX)
+Y <- rbind(trainY, testY)
+
+#Extracts only the measurements on the mean and standard deviation for each measurement. 
+# To do this, need to get labels on our data since the column names contain mean(), std(), etc. as part of their name
+featureLabels <- read.table(paste(SubDir, "/features.txt", sep=""))
+#Use transpose to change our feature label rows to columns and then apply as column names for the X table (features)
+colnames(X) <- t(featureLabels[2])
+
+#Do the same for activities
+activityLabels <- read.table(paste(SubDir, "/activity_labels.txt", sep=""))
+colnames(Y) <- "Activity"
+colnames(activityLabels) <- c("Activity", "Activity Label")
+#Join our activities (Y) with activity labels 
+activities <- merge(Y, activityLabels, by = "Activity")
+
+
