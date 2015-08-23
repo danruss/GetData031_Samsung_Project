@@ -21,7 +21,7 @@ SubDir <- "UCI HAR Dataset"
 #Load dplyr which makes it easier to manage our data frames
 library(dplyr)
 
-#Merge training and test data sets to create one dat set
+#Merge training and test data sets to create one data set
 trainSubject <- read.table(paste(SubDir,"/train/subject_train.txt",sep=""))
 trainX <- read.table(paste(SubDir,"/train/X_train.txt",sep=""))
 trainY <- read.table(paste(SubDir,"/train/y_train.txt",sep=""))
@@ -46,5 +46,12 @@ colnames(Y) <- "Activity"
 colnames(activityLabels) <- c("Activity", "Activity Label")
 #Join our activities (Y) with activity labels 
 activities <- merge(Y, activityLabels, by = "Activity")
+
+#Label the Subject column
+colnames(subject) <- "Subject"
+
+#Combine the labeled data to one data table
+fullData <- cbind(subject, activities, X)
+
 
 
