@@ -40,7 +40,7 @@ featureLabels <- read.table(paste(SubDir, "/features.txt", sep=""))
 #Use transpose to change our feature label rows to columns and then apply as column names for the X table (features)
 colnames(X) <- t(featureLabels[2])
 
-#Do the same for activities
+#Get the activity labels
 activityLabels <- read.table(paste(SubDir, "/activity_labels.txt", sep=""))
 colnames(Y) <- "Activity"
 colnames(activityLabels) <- c("Activity", "Activity Label")
@@ -52,6 +52,8 @@ colnames(subject) <- "Subject"
 
 #Combine the labeled data to one data table
 fullData <- cbind(subject, activities, X)
+
+#Do the extraction for column names with mean and std in them
 
 
 
