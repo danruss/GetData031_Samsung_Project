@@ -20,6 +20,8 @@ SubDir <- "UCI HAR Dataset"
 
 #Load dplyr which makes it easier to manage our data frames
 library(dplyr)
+#Load stringr library which gives us access to str_replace_all function for later column renaming
+library(stringr)
 
 #Merge training and test data sets to create one data set
 trainSubject <- read.table(paste(SubDir,"/train/subject_train.txt",sep=""))
@@ -43,7 +45,7 @@ colnames(X) <- t(featureLabels[2])
 #Get the activity labels
 activityLabels <- read.table(paste(SubDir, "/activity_labels.txt", sep=""))
 colnames(Y) <- "Activity"
-colnames(activityLabels) <- c("Activity", "Activity Label")
+colnames(activityLabels) <- c("Activity", "ActivityLabel")
 #Join our activities (Y) with activity labels 
 activities <- merge(Y, activityLabels, by = "Activity")
 
@@ -54,6 +56,32 @@ colnames(subject) <- "Subject"
 fullData <- cbind(subject, activities, X)
 
 #Do the extraction for column names with mean and std in them
+meanStdData <- fullData[,grep("((Subject|ActivityLabel)|((mean|std)\\(\\)))", colnames(fullData))]
 
+#Summarize the data grouping by Subject and Activity
+summaryData <- 
+  meanStdData %>%
+  group_by(Subject,ActivityLabel) %>%
+  summarise_each(funs(mean))
 
+#colnames(summaryData)
+#expand column name abbreviations to friendly names
+# t -> Time (prefix 't' to denote time) 
+# f -> Frequency (Note the 'f' to indicate frequency domain signals). 
+# Gyro -> Gyroscope
+# Acc -> Acceleration
+# Mag -> Magnitude
+# mean() -> Average
+# std() -> StandardDeviation
 
+tempColumnNames <- colnames(summaryData)
+tempColumnNames <- str_replace_all(tempColumnNames, "^t", "Time-")
+tempColumnNames <- str_replace_all(tempColumnNames, "^f", "Frequency-")
+tempColumnNames <- str_replace_all(tempColumnNames, "Gyro", "Gyroscope")
+tempColumnNames <- str_replace_all(tempColumnNames, "Acc", "Acceleration")
+tempColumnNames <- str_replace_all(tempColumnNames, "Mag", "Magnitude")
+tempColumnNames <- str_replace_all(tempColumnNames, "mean\\(\\)", "Average")
+tempColumnNames <- str_replace_all(tempColumnNames, "std\\(\\)", "StandardDeviation")
+colnames(summaryData) <- tempColumnNames
+
+write.table(summaryData, file="SamsungSummaryData.txt", row.name=FALSE)
